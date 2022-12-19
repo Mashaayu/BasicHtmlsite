@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Basic html project</title>
+</head>
+
+<body style="padding: 40px;">
+    <h1>Backtracking</h1>
+    <p>Copyright ©2002 by David Matuszek</p>
+    <p>Backtracking is a form of recursion</p>
+    <p>The usual scenario is that you are faced with a number of options, and you must choose one of these. After you
+        make your choice you will get a new set of options; just what set of options you get depends on what choice
+        you made. This procedure is repeated over and over until you reach a final state. If you made a good sequence
+        of choices, your final state is a goal state; if you didn't, it isn't.
+    </p>
+    <p>
+        Conceptually, you start at the root of a tree; the tree probably has some good leaves and some bad leaves,
+        though it may be that the leaves are all good or all bad. You want to get to a good leaf. At each node,
+        beginning
+        with the root, you choose one of its children to move to, and you keep this up until you get to a leaf.
+    </p>
+    <p> Suppose you get to a bad leaf. You can backtrack to continue the search for a good leaf by revoking your most
+        recent choice, and trying out the next option in that set of options. If you run out of options, revoke the
+        choice
+        that got you here, and try another choice at that node. If you end up at the root with no options left, there
+        are no
+        good leaves to be found.
+    </p>
+    <p>This needs an example.</p>
+    <center><img src="treesearch.gif" alt=""></center>
+    <ol>
+        <li>Starting at Root, your options are A and B. You choose A.</li>
+        <li> At A, your options are C and D. You choose C.</li>
+        <li>C is bad. Go back to A.</li>
+        <li>At A, you have already tried C, and it failed. Try D.</li>
+        <li> D is bad. Go back to A.</li>
+        <li>At A, you have no options left to try. Go back to Root.</li>
+        <li>At Root, you have already tried A. Try B.</li>
+        <li>At B, your options are E and F. Try E.</li>
+        <li>E is good. Congratulations!</li>
+    </ol>
+    <p>In this example we drew a picture of a tree. The tree is an abstract model of the possible sequences of choices
+        we could make. There is also a data structure called a tree, but usually we don't have a data structure to tell
+        us
+        what choices we have. (If we do have an actual tree data structure, backtracking on it is called
+        <i><strong>depth-first-tree searching</strong></i>)</p>
+    <h3>The backtracking algorithm.</h3>
+    <p>Here is the algorithm (in pseudocode) for doing backtracking from a given node n:</p>
+    <font size="4" color="red">
+        <pre>
+        boolean solve(Node n) {
+            if n is a leaf node {
+                if the leaf is a goal node, return true
+                else return false
+            } else {
+                for each child c of n {
+                    if solve(c) succeeds, return true
+                }
+                return false
+            }
+        }
+    </pre>
+    </font>
+
+    <p>Notice that the algorithm is expressed as a <i> boolean</i> function. This is essential to understanding the
+        algorithm.
+        If <font size="4" color="red">solve(n)</font> is true, that means node <font size="4" color="red">n</font> is
+        part of a solution--that is, node n is one of the nodes on a path from
+        the root to some goal node. We say that n is <i>solvable.</i> If <font size="4" color="red">solve(n)</font> is
+        false, then there is no path that includes
+        <font size="4" color="red">n</font>to any goal node.
+    </p>
+    <p>How does it work?</p>
+    <ul>
+        <li>If any child of <font size="4" color="red">n</font> is solvable, then <font size="4" color="red">n</font>is
+            solvable.</li>
+        <li>If no child of <font size="4" color="red">n</font> is solvable, then <font size="4" color="red">n</font> is
+            not solvable.</li>
+    </ul>
+    <p>Hence, to decide whether any non-leaf node <font size="4" color="red">n</font> is solvable (part of a path to a
+        goal node), all you have to do is
+        test whether any child of <font size="4" color="red">n</font> is solvable. This is done recursively, on each
+        child of <font size="4" color="red">n</font>. In the above code, this is
+        done by the lines
+    </p>
+    <font size="4" color="red">
+        <pre>
+            for each child c of n {
+                if solve(c) succeeds, return true
+            }
+            return false
+        </pre>
+    </font>
+    <p>Eventually the recursion will "bottom" out at a leaf node. If the leaf node is a goal node, it is solvable; if
+        the
+        leaf node is not a goal node, it is not solvable. This is our base case. In the above code, this is done by the
+        lines
+    </p>
+    <font size="4" color="red">
+        <pre>
+            if n is a leaf node {
+                if the leaf is a goal node, return true
+                else return false
+            }            
+        </pre>
+    </font>
+    <p>The backtracking algorithm is simple but important. You should understand it thoroughly. Another way of
+        stating it is as follows:
+    </p>
+    <ul>
+        <li>To search a tree:</li>
+        <ol>
+            <li> If the tree consists of a single leaf, test whether it is a goal node</li>
+            <li>Otherwise, search the subtrees until you find one containing a goal node, or until you have
+                searched them all unsuccessfully.
+            </li>
+        </ol>
+    </ul>
+    <h3>Keeping backtracking simple</h3>
+    <p>All of these versions of the backtracking algorithm are pretty simple, but when applied to a real problem, they
+        can get pretty cluttered up with details. Even determining whether the node is a leaf can be complex: for
+        example, if the path represents a series of moves in a chess endgame problem, the leaves are the checkmate
+        and stalemate solutions.
+    </p>
+    <p>To keep the program clean, therefore, tests like this should be buried in methods. In a chess game, for example,
+        you could test whether a node is a leaf by writing a <font size="4" color="red">gameOver</font> method (or you
+        could even call it <font size="4" color="red">isLeaf)</font>.
+        This method would encapsulate all the ugly details of figuring out whether any possible moves remain
+    </p>
+    <p>Notice that the backtracking altorithms require us to keep track, for each node on the current path, which of its
+        children have been tried already (so we don't have to try them again). In the above code we made this look
+        simple, by just saying for <font size="4" color="red">each child c of n</font>. In reality, it may be difficult
+        to figure out what the possible
+        children are, and there may be no obvious way to step through them. In chess, for example, a node can
+        represent one arrangement of pieces on a chessboard, and each child of that node can represent the
+        arrangement after some piece has made a legal move. How do you find these children, and how do you keep
+        track of which ones you've already examined?
+    </p>
+    <p>
+        The most straightforward way to keep track of which children of the node have been tried is as follows: Upon
+        initial entry to the node (that is, when you first get there from above), make a list of all its children. As
+        you try
+        each child, take it off the list. When the list is empty, there are no remaining untried children, and you can
+        return "failure." This is a simple approach, but it may require quite a lot of additional work.
+    </p>
+    <p>children. If there is an ordering, and you know which child you just tried, you can determine which child to try
+        next.<br>
+        For example, you might be able to number the children <font size="4" color="red">1</font> through <font size="4"
+            color="red">n</font>, and try them in numerical order. Then, if
+        you have just tried child <font size="4" color="red">k</font>, you know that you have already tried children
+        <font size="4" color="red">1</font> through <font size="4" color="red">k1</font>, and you have not
+        yet tried children <font size="4" color="red">k+1</font> through <font size="4" color="red">n</font>. Or, if you
+        are trying to color a map with just four colors, you can always try
+        red first, then yellow, then green, then blue. If child yellow fails, you know to try child green next. If you
+        are
+        searching a maze, you can try choices in the order left, straight, right (or perhaps north, east, south, west).
+    </p>
+    <h3>Example: TreeSearch</h3>
+    <p>For starters, let's do the simplest possible example of backtracking, which is searching an actual tree. We will
+        also use the simplest kind of tree, a binary tree.
+    </p>
+    <p>
+        A <b>binary tree</b> is a data structure composed of <b>nodes</b>. One node is designated as the <b>root
+            node</b>. Each node can
+        reference (point to) zero, one, or two other nodes, which are called its <b>children</b>. The children are
+        referred to as
+        the <b>left child</b> and/or the <b>right child</b>. All nodes are reachable (by one or more steps) from the
+        root node, and
+        there are no cycles. For our purposes, although this is not part of the definition of a binary tree, we will say
+        that
+        a node might or might not be a goal node, and will contain its name. The first example in this paper (which we
+        repeat here) shows a binary tree.
+    </p>
+    <center><img src="treesearch.gif" alt=""></center>
+    <p>Here's a definition of the BinaryTree class:</p>
+    <pre>
+        <font size="4" color="red">
+            public class BinaryTree {
+                BinaryTree leftChild = null;
+                BinaryTree rightChild = null;
+                boolean isGoalNode = false;
+                String name;
+                
+                BinaryTree(String name, BinaryTree left, BinaryTree right, boolean isGoalNode) {
+                    this.name = name;
+                    leftChild = left;
+                    rightChild = right;
+                    this.isGoalNode = isGoalNode;
+                }
+            }
+        </font>
+    </pre>
+    <p>
+        Next we will create a <font size="4" color="red">TreeSearch</font> class, and in it we will define a method
+        makeTree() which constructs
+        the above binary tree.
+    </p>
+    <pre>
+        <font size="4" color="red">
+            static BinaryTree makeTree() {
+                BinaryTree root, a, b, c, d, e, f;
+                c = new BinaryTree("C", null, null, false);
+                d = new BinaryTree("D", null, null, false);
+                e = new BinaryTree("E", null, null, true);
+                f = new BinaryTree("F", null, null, false);
+                a = new BinaryTree("A", c, d, false);
+                b = new BinaryTree("B", e, f, false);
+                root = new BinaryTree("Root", a, b, false);
+                return root;
+            }
+        </font>
+    </pre>
+    <p>Here's a main program to create a binary tree and try to solve it:</p>
+    <pre>
+        <font size="4" color="red">
+            public static void main(String args[]) {
+                BinaryTree tree = makeTree();
+                System.out.println(solvable(tree));
+            }
+            
+        </font>
+    </pre>
+    <p>And finally, here's the recursive backtracking routine to "solve" the binary tree by finding a goal node.</p>
+    <pre>
+        <font size="4" color="red">
+            static boolean solvable(BinaryTree node) {
+               <font color="blue"> /* 1 */ </font>if (node == null) return false;
+               <font color="blue"> /* 2 */ </font>if (node.isGoalNode) return true;
+               <font color="blue"> /* 3 */ </font>if (solvable(node.leftChild)) return true;
+               <font color="blue"> /* 4 */ </font>if (solvable(node.rightChild)) return true;
+               <font color="blue"> /* 5 */ </font>return false;
+                }  
+        </font>
+    </pre>
+    <p>Here's what the numbered lines are doing:</p>
+    <ol>
+        <li> If we are given a null node, it's not solvable. This statement is so that we can call this method with the
+            children of a node, without first checking whether those children actually exist
+        </li>
+        <li>
+            If the node we are given is a goal node, return success.
+        </li>
+        <li>
+            See if the left child of node is solvable, and if so, conclude that node is solvable. We will only get to
+            this line if node is non-null and is not a goal node, says to
+        </li>
+        <li>
+            Do the same thing for the right child.
+        </li>
+        <li>Since neither child of node is solvable, node itself is not solvable.</li>
+    </ol>
+    <p>Those appear pretty similar, and you might think they are equally good. However, the timing information
+        suggests otherwise
+    </p>
+    <table align="center" border="1">
+        <tbody>
+            <tr>
+                <td></td>
+                <td bgcolor="#ABA9A9">2 by 3 map</td>
+                <td bgcolor="#ABA9A9">3 by 3 map</td>
+                <td bgcolor="#ABA9A9"> 3 by 4 map</td>
+            </tr>
+
+            <tr>
+                <td bgcolor="#ABA9A9">Method 1: </td>
+                <td>60 ms.</td>
+                <td>940 ms.</td>
+                <td>60540 ms.(1 minute)</td>
+            </tr>
+
+            <tr>
+                <td bgcolor="#ABA9A9">Method 2:</td>
+                <td>0 ms.</td>
+                <td>0 ms.</td>
+                <td>0 ms.</td>
+
+            </tr>
+
+        </tbody>
+    </table>
+    <h3>Example: Cindy's Puzzle</h3>
+    <p>I call the following puzzle "Cindy's puzzle" for historical reasons. You have some number n of black marbles
+        and the same number of white marbles, and you have a playing board which consists simply of a line of
+        2n+1 spaces to put the marbles in. Start with the black marbles all at one end (say, the left), the white
+        marbles all at the other end, and a free space in between.
+    </p>
+    <table align="center" border="1">
+        <tbody>
+            <tr>
+                <td>
+                    <img src="whiteball.png" alt="" width="65" height="65">
+                </td>
+                <td>
+                    <img src="whiteball.png" alt="" width="65" height="65">
+                </td>
+                <td>
+                    <img src="download.png" alt="" width="65" height="65">
+                </td>
+                <td>
+                    <img src="download (2).jpg" alt="" width="65" height="65">
+                </td>
+                <td>
+                    <img src="download (2).jpg" alt="" width="65" height="65">
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <p>
+        The goal is to reverse the positions of the marbles:
+    </p>
+    <table align="center" border="1">
+        <tbody>
+            <tr>
+                <td>
+                    <img src="download (2).jpg" alt="" width="65" height="65">
+                </td>
+                <td>
+                    <img src="download (2).jpg" alt="" width="65" height="65">
+                </td>
+                <td>
+                    <img src="download.png" alt="" width="65" height="65">
+                </td>
+                <td>
+                    <img src="whiteball.png" alt="" width="65" height="65">
+                </td>
+                <td>
+                    <img src="whiteball.png" alt="" width="65" height="65">
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <p>The black marbles can only move to the right, and the white marbles can only move to the left (no backing up).
+        At each move, a marble can either:
+    </p>
+    <ul>
+        <li>Move one space ahead, if that space is clear, or</li>
+        <li>Jump ahead over exactly one marble of the opposite color, if the space just beyond that marble is clear.
+        </li>
+    </ul>
+    <p>For example, you could make the following sequence of moves:</p>
+    <style>
+        .Divi {
+            display: inline-block;
+            padding-bottom: 5px;
+        }
+
+        .Divi2 {
+            display: inline-block;
+           padding-left: 60px;
+        }
+    </style>
+   
+    <div class="parent" align="center">
+
+        <div class="Divi">
+            <h2>Starting position:</h2>
+        </div>
+        <div class="Divi2">
+            <table border="1">
+                <tbody>
+                    <tr>
+                        <td>
+                            <img src="download (2).jpg" alt="" width="65" height="65">
+                        </td>
+                        <td>
+                            <img src="download (2).jpg" alt="" width="65" height="65">
+                        </td>
+                        <td>
+                            <img src="download.png" alt="" width="65" height="65">
+                        </td>
+                        <td>
+                            <img src="whiteball.png" alt="" width="65" height="65">
+                        </td>
+                        <td>
+                            <img src="whiteball.png" alt="" width="65" height="65">
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+       
+    <div class="parent" align="center">
+
+        <div class="Divi">
+            <h2>Black moves ahead:</h2>
+        </div>
+        <div class="Divi2">
+            <table border="1">
+                <tbody>
+                    <tr>
+                        <td>
+                            <img src="download (2).jpg" alt="" width="65" height="65">
+                        </td>
+                        <td>
+                            <img src="download.png" alt="" width="65" height="65">
+                        </td>
+                        <td>
+                            <img src="download (2).jpg" alt="" width="65" height="65">
+                        </td>
+                        <td>
+                            <img src="whiteball.png" alt="" width="65" height="65">
+                        </td>
+                        <td>
+                            <img src="whiteball.png" alt="" width="65" height="65">
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="parent" align="center">
+
+        <div class="Divi">
+            <h2>White jumps:</h2>
+        </div>
+        <div class="Divi2">
+            <table border="1">
+                <tbody>
+                    <tr>
+                        <td>
+                            <img src="download (2).jpg" alt="" width="65" height="65">
+                        </td>
+                        <td>
+                            <img src="whiteball.png" alt="" width="65" height="65">
+                        </td>
+                        <td>
+                            <img src="download (2).jpg" alt="" width="65" height="65">
+                        </td>
+                        <td>
+                            <img src="download.png" alt="" width="65" height="65">
+                        </td>
+                        <td>
+                            <img src="whiteball.png" alt="" width="65" height="65">
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="parent" align="center">
+
+        <div class="Divi">
+            <h2>Black moves ahead:</h2>
+        </div>
+        <div class="Divi2">
+            <table border="1">
+                <tbody>
+                    <tr>
+                        <td>
+                            <img src="download (2).jpg" alt="" width="65" height="65">
+                        </td>
+                        <td>
+                            <img src="whiteball.png" alt="" width="65" height="65">
+                        </td>
+                        <td>
+                            <img src="download.png" alt="" width="65" height="65">
+                        </td>
+                        <td>
+                            <img src="download (2).jpg" alt="" width="65" height="65">
+                        </td>
+                        <td>
+                            <img src="whiteball.png" alt="" width="65" height="65">
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="parent" align="center">
+
+        <div class="Divi">
+            <h2>Black jumps:</h2>
+        </div>
+        <div class="Divi2">
+            <table border="1">
+                <tbody>
+                    <tr>
+                        <td>
+                            <img src="download.png" alt="" width="65" height="65">
+                        </td>
+                        <td>
+                            <img src="whiteball.png" alt="" width="65" height="65">
+                        </td>
+                        <td>
+                            <img src="download (2).jpg" alt="" width="65" height="65">
+                        </td>
+                        <td>
+                            <img src="download (2).jpg" alt="" width="65" height="65">
+                        </td>
+                        <td>
+                            <img src="whiteball.png" alt="" width="65" height="65">
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="parent" align="center">
+
+        <div class="Divi">
+            <h2>white moves ahead:</h2>
+        </div>
+        <div class="Divi2">
+            <table border="1">
+                <tbody>
+                    <tr>
+                        <td>
+                            <img src="download.png" alt="" width="65" height="65">
+                        </td>
+                        <td>
+                            <img src="whiteball.png" alt="" width="65" height="65">
+                        </td>
+                        <td>
+                            <img src="download (2).jpg" alt="" width="65" height="65">
+                        </td>
+                        <td>
+                            <img src="download (2).jpg" alt="" width="65" height="65">
+                        </td>
+                        <td>
+                            <img src="whiteball.png" alt="" width="65" height="65">
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <p>Here is some output from the program:</p>
+    <ol start="16" reversed style="font: italic 1.1em Georgia, Times, serif; color: blue;">
+        <li><h2 style=" font: bold .8em Arial, Helvetica, sans-serif; color: black">WHITE &nbsp;&nbsp; WHITE &nbsp;&nbsp; WHITE &nbsp;&nbsp; _____ &nbsp;&nbsp; BLACK &nbsp;&nbsp;BLACK &nbsp;&nbsp;BLACK</h2></li>
+        <li><h2 style=" font: bold .8em Arial, Helvetica, sans-serif; color: black">  WHITE &nbsp;&nbsp;WHITE &nbsp;&nbsp; WHITE &nbsp;&nbsp; BLACK &nbsp;&nbsp; _____  &nbsp;&nbsp;BLACK  &nbsp;&nbsp;BLACK</h2></li>
+        <li><h2 style=" font: bold .8em Arial, Helvetica, sans-serif; color: black">WHITE &nbsp;&nbsp; WHITE &nbsp;&nbsp; _____  &nbsp;&nbsp;BLACK &nbsp;&nbsp; WHITE  &nbsp;&nbsp;BLACK  &nbsp;&nbsp;BLACK</h2></li>
+        <li><h2 style=" font: bold .8em Arial, Helvetica, sans-serif; color: black">WHITE &nbsp;&nbsp; _____  &nbsp;&nbsp;WHITE &nbsp;&nbsp; BLACK &nbsp;&nbsp; WHITE &nbsp;&nbsp; BLACK &nbsp;&nbsp; BLACK</h2></li>
+        <li><h2 style=" font: bold .8em Arial, Helvetica, sans-serif; color: black">WHITE &nbsp;&nbsp; BLACK &nbsp;&nbsp; WHITE &nbsp;&nbsp; _____ &nbsp;&nbsp; WHITE &nbsp;&nbsp; BLACK &nbsp;&nbsp; BLACK</h2></li>
+        <li><h2 style=" font: bold .8em Arial, Helvetica, sans-serif; color: black">WHITE &nbsp;&nbsp; BLACK &nbsp;&nbsp; WHITE &nbsp;&nbsp; BLACK &nbsp;&nbsp; WHITE &nbsp;&nbsp; _____ &nbsp;&nbsp; BLACK</h2></li>
+        <li><h2 style=" font: bold .8em Arial, Helvetica, sans-serif; color: black">WHITE &nbsp;&nbsp; BLACK &nbsp;&nbsp; WHITE &nbsp;&nbsp; BLACK &nbsp;&nbsp; WHITE &nbsp;&nbsp; BLACK &nbsp;&nbsp; ____</h2></li>
+        <li><h2 style=" font: bold .8em Arial, Helvetica, sans-serif; color: black">WHITE &nbsp;&nbsp; BLACK &nbsp;&nbsp; WHITE  &nbsp;&nbsp;BLACK &nbsp;&nbsp; _____ &nbsp;&nbsp; BLACK &nbsp;&nbsp; WHITE</h2></li>
+        <li><h2 style=" font: bold .8em Arial, Helvetica, sans-serif; color: black">WHITE &nbsp;&nbsp; BLACK &nbsp;&nbsp; _____  &nbsp;&nbsp;BLACK &nbsp;&nbsp; WHITE &nbsp;&nbsp; BLACK &nbsp;&nbsp; WHITE</h2></li>
+        <li><h2 style=" font: bold .8em Arial, Helvetica, sans-serif; color: black">_____ &nbsp;&nbsp; BLACK &nbsp;&nbsp; WHITE &nbsp;&nbsp; BLACK &nbsp;&nbsp; WHITE &nbsp;&nbsp; BLACK &nbsp;&nbsp; WHITE</h2></li>
+        <li><h2 style=" font: bold .8em Arial, Helvetica, sans-serif; color: black">BLACK &nbsp;&nbsp; _____ &nbsp;&nbsp; WHITE&nbsp;&nbsp;  BLACK &nbsp;&nbsp; WHITE  &nbsp;&nbsp;BLACK  &nbsp;&nbsp;WHITE</h2></li>
+        <li><h2 style=" font: bold .8em Arial, Helvetica, sans-serif; color: black">BLACK &nbsp;&nbsp; BLACK  &nbsp;&nbsp;WHITE  &nbsp;&nbsp;_____ &nbsp;&nbsp; WHITE &nbsp;&nbsp; BLACK  &nbsp;&nbsp;WHITE</h2></li>
+        <li><h2 style=" font: bold .8em Arial, Helvetica, sans-serif; color: black">BLACK &nbsp;&nbsp; BLACK &nbsp;&nbsp; WHITE  &nbsp;&nbsp;BLACK &nbsp;&nbsp; WHITE  &nbsp;&nbsp;_____  &nbsp;&nbsp;WHITE</h2></li>
+        <li><h2 style=" font: bold .8em Arial, Helvetica, sans-serif; color: black"> BLACK &nbsp;&nbsp; BLACK&nbsp;&nbsp;  WHITE&nbsp;&nbsp;  BLACK &nbsp;&nbsp; _____ &nbsp;&nbsp; WHITE &nbsp;&nbsp; WHITE</h2></li>
+        <li><h2 style=" font: bold .8em Arial, Helvetica, sans-serif; color: black"> BLACK &nbsp;&nbsp; BLACK &nbsp;&nbsp; _____ &nbsp;&nbsp; BLACK  &nbsp;&nbsp;WHITE&nbsp;&nbsp;  WHITE &nbsp;&nbsp; WHITE</h2></li>
+        <li><h2 style=" font: bold .8em Arial, Helvetica, sans-serif; color: black">BLACK &nbsp;&nbsp; BLACK  &nbsp;&nbsp;BLACK  &nbsp;&nbsp;_____  &nbsp;&nbsp;WHITE &nbsp;&nbsp; WHITE  &nbsp;&nbsp;WHITE</h2></li>
+
+    </ol>
+    <p>Notice that the solution is given in reverse order: BLACK starts out on the left and WHITE on the right, as in
+        the last line. I've added line numbers to the actual output in order to emphasize this point. Backtracking always
+        produces its results (sequence of choices) in reverse order; it is up to you, the programmer, to reverse the
+        results again to get them in the correct order.
+    </p>
+    
+</body>
+
+</html>
